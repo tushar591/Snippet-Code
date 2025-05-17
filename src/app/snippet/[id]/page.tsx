@@ -8,7 +8,7 @@ export default async function SnipperDetailsPage({
 }: {
   params: { id: string };
 }) {
-  const id = parseInt(params.id);
+  const id = await parseInt(params.id);
   // console.log(typeof id);
 
   const snippet = await prisma.snippet.findUnique({
