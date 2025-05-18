@@ -22,3 +22,19 @@ export default async function SaveCode(id: number, code: string) {
     </div>
   )
 }
+
+export async function NewSnippetForm(prevState: { message: string }, formData: FormData) {
+  const title = formData.get("title") as string;
+  const code = formData.get("code") as string;
+
+  if (!title || !code) {
+    return { message: "Title and code are required." };
+  }
+
+  await prisma.snippet.create({
+    data: { title, code },
+  });
+
+  redirect("/");
+ // return { message: "Snippet created successfully!" };
+}
