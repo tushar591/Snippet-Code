@@ -1,37 +1,27 @@
 import { Button } from "@/components/ui/button";
 import { prisma } from "@/lib/prisma";
 import Link from "next/link";
-import React from "react";
+import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 
-export default async function SnipperDetailsPage({
-  params,
-}: {
-  params: { id: string };
-}) {
+export async function Deletesnippet(formData: FormData) {
+  "use server";
+  const id = Number(formData.get("id"));
+  await prisma.snippet.delete({ where: { id } });
+  revalidatePath("/");
+  redirect("/");
+}
+
+export default async function SnipperDetailsPage({ params }: { params: { id: string } }) {
   const id = parseInt(params.id);
-   //console.log(id);
 
   const snippet = await prisma.snippet.findUnique({
-    where: {
-      id: id,
-    },
+    where: { id },
   });
 
   if (!snippet) {
     return <h1>Snippet not found</h1>;
   }
-
- const Deletesnippet = async () => {
-  "use server";
-    const snippet = await prisma.snippet.findUnique({ where: { id } });
-      if (!snippet) {
-        return <div>Snippet not found</div>;
-      }
-    
-     await prisma.snippet.delete({ where: { id } });
-     redirect("/");
- }
 
   return (
     <div>
@@ -42,7 +32,8 @@ export default async function SnipperDetailsPage({
             <Button>Edit</Button>
           </Link>
           <form action={Deletesnippet}>
-          <Button variant={"destructive"} type="submit">Delete</Button>
+            <input type="hidden" name="id" value={snippet.id} />
+            <Button variant={"destructive"} type="submit">Delete</Button>
           </form>
         </div>
       </div>

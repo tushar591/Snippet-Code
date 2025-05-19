@@ -1,5 +1,6 @@
 "use server";
 import { prisma } from '@/lib/prisma';
+import { revalidatePath } from 'next/cache';
 import { redirect } from 'next/navigation';
 import React from 'react'
 
@@ -13,7 +14,7 @@ export default async function SaveCode(id: number, code: string) {
             code: code
         }
     })
-
+    revalidatePath(`/snippet/${id}`);
     redirect(`/snippet/${id}`);
 
     return (
@@ -34,7 +35,14 @@ export async function NewSnippetForm(prevState: { message: string }, formData: F
   await prisma.snippet.create({
     data: { title, code },
   });
-
+  revalidatePath("/");
   redirect("/");
  // return { message: "Snippet created successfully!" };
+}
+
+export async function DeleteSnippetForm(formData: FormData) {
+  const id = Number(formData.get("id"));
+  await prisma.snippet.delete({ where: { id } });
+  revalidatePath("/");
+  redirect("/");
 }

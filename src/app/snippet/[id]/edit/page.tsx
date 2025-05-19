@@ -19,3 +19,10 @@ export default async function Edit(params: { params: { id: string } }) {
     </div>
   );
 }
+
+export const generateStaticparams = async () => {
+  const snippets = await prisma.snippet.findMany();
+  return snippets.map((snippet) => ({
+    id: snippet.id.toString(),
+  }));
+}
